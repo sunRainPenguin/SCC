@@ -47,6 +47,7 @@ int main()
 	
 	vector<Node*> transitionToNode;
 	string strTransition;
+	vector<string> tmpTransitions;
 	for (int i = 0; i < nodeVec.size(); i++)
 	{		
 		needReinput = true;
@@ -54,21 +55,27 @@ int main()
 		{
 			needReinput = false;
 			transitionToNode.clear();
+			tmpTransitions.clear();
 			cout << "Please enter transitions of the Node (" << i << ") (e.g: '3 5 a'):\n";
 			while (cin >> strTransition)
 			{
-				if (find(tmpIDs.begin(), tmpIDs.end(), strTransition) == tmpIDs.end())
+				if (find(tmpIDs.begin(), tmpIDs.end(), strTransition) == tmpIDs.end() || find(tmpTransitions.begin(), tmpTransitions.end(), strTransition) != tmpTransitions.end())
 				{
 					needReinput = true;
-					cout << "There are some invalid Node IDs!\n";
+					cout << "There are some invalid Node IDs or repeated IDs!\n";
+					cin.clear();		//检测到第一次输入错误，就清空该节点的所有transition节点
+					cin.sync();	// 清除 cin 缓冲区未读取信息
 					break;
 				}
-				transitionToNode.push_back(nodeTable[strTransition]);
-			} 
+				tmpTransitions.push_back(strTransition);
+			}
+			for (int i = 0; i < tmpTransitions.size(); i++)
+				transitionToNode.push_back(nodeTable[tmpTransitions[i]]);
 
 		}
 		nodeVec[i]->setTransitions(transitionToNode);
 		cin.clear();
+		cin.sync();
 	}
 
 	dotFile << "digraph srcPic{";
@@ -92,8 +99,8 @@ int main()
 	dotFile.flush();
 	dotFile.close();
 
-	char cmdExplore[] = "F:";
-	char cmdExe[] = "F:\\Graphviz2.38\\bin\\dot.exe -Tpng -o graph.png graph.dot";
+	char cmdExplore[] = "D:";
+	char cmdExe[] = "D:\\Graphviz2.38\\bin\\dot.exe -Tpng -o graph.png graph.dot";
 	WinExec(cmdExplore, SW_NORMAL);
 	WinExec(cmdExe, SW_NORMAL);
 
