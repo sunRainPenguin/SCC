@@ -8,78 +8,76 @@ using namespace std;
 int main()
 {
 	//后面记得清空一下指针
+	ifstream inFile("inputPic.txt");
 	ofstream dotFile;			//.dot文件
 	vector<Node*>  nodeVec;			//存放图中出现的所有节点
 	vector<string> tmpIDs;			//存放所有节点的ID
 	hash_map<string, Node*> nodeTable;			//将节点的ID与相应的Node组成一张表，便于通过ID查找node
 	hash_map<string, Node*>::iterator it;		//用于遍历hash表的迭代器
 	dotFile.open("graph.dot");
+	int errNum=0;
 
-	string strID;
-	bool needReinput = true;
-	while (needReinput)
-	{
-		needReinput = false;
-		tmpIDs.clear();
-		cout << "Please enter the nodes IDs and split the strings with spaces (e.g: '2 3 4 a'):\n";
-		while (cin >> strID)
-		{
-			if (count(tmpIDs.begin(), tmpIDs.end(), strID)>0)
-			{
-				needReinput = true;
-				cout << "There are some repeated Node IDs!\n";
-				break;
-			}
-			tmpIDs.push_back(strID);
-		}
-
-	}
-	cin.clear();
-	cin.sync();
-
-	for (int i = 0; i<tmpIDs.size(); i++)
-	{
-		Node* node = new Node();
-		node->setID(tmpIDs[i]);
-		nodeVec.push_back(node);
-		nodeTable[tmpIDs[i]] = node;
-	}
-	
+	string str;
+	int inputType=-1;			//遇到"//"表示切换输入类型，-1表示目前输入的是节点，0表示第0个节点的transition列表，1表示第1个节点的...
 	vector<Node*> transitionToNode;
-	string strTransition;
 	vector<string> tmpTransitions;
-	for (int i = 0; i < nodeVec.size(); i++)
-	{		
-		needReinput = true;
-		while (needReinput)
+	while (inFile >> str)
+	{
+		/*cout << "Read from file: " << str << endl;*/
+		if (str == "//")
 		{
-			needReinput = false;
-			transitionToNode.clear();
-			tmpTransitions.clear();
-			cout << "Please enter transitions of the Node (" << i << ") (e.g: '3 5 a'):\n";
-			while (cin >> strTransition)
+			if (inputType == -1)			//节点列表输入完毕
 			{
-				if (find(tmpIDs.begin(), tmpIDs.end(), strTransition) == tmpIDs.end() || find(tmpTransitions.begin(), tmpTransitions.end(), strTransition) != tmpTransitions.end())
+				for (int i = 0; i<tmpIDs.size(); i++)
 				{
-					needReinput = true;
-					cout << "There are some invalid Node IDs or repeated IDs!\n";
-					cin.clear();		//检测到第一次输入错误，就清空该节点的所有transition节点
-					cin.sync();	// 清除 cin 缓冲区未读取信息
-					break;
+					Node* node = new Node();
+					node->setID(tmpIDs[i]);
+					nodeVec.push_back(node);
+					nodeTable[tmpIDs[i]] = node;
 				}
-				tmpTransitions.push_back(strTransition);
 			}
-			if (needReinput == false)
+			if (inputType>-1 && inputType < nodeVec.size())
 			{
 				for (int i = 0; i < tmpTransitions.size(); i++)
 					transitionToNode.push_back(nodeTable[tmpTransitions[i]]);
+				nodeVec[inputType]->setTransitions(transitionToNode);
+				transitionToNode.clear();
+				tmpTransitions.clear();
 			}
-			
+			inputType++;
+			continue;
 		}
-		nodeVec[i]->setTransitions(transitionToNode);
-		cin.clear();
-		cin.sync();
+		if (inputType == -1)
+		{
+			if (count(tmpIDs.begin(), tmpIDs.end(), str)>0)
+			{
+				cout << "There are some repeated Node IDs!\n";
+				errNum = 1;
+				return errNum;
+			}
+			else
+			{
+				tmpIDs.push_back(str);
+			}
+		}
+		
+		if (inputType > -1 && inputType < nodeVec.size())
+		{
+			cout << "The transitions of the Node (" << inputType << "): "<<str<<"\n";
+			if (find(tmpIDs.begin(), tmpIDs.end(), str) == tmpIDs.end() || find(tmpTransitions.begin(), tmpTransitions.end(), str) != tmpTransitions.end())
+			{
+				cout << "There are some invalid transitions or repeated transitions!\n";
+				errNum = 2;
+				return errNum;
+			}
+			else
+			{
+				tmpTransitions.push_back(str);
+			}
+		}
+
 	}
+	cout << "complete reading!\n";
 
 	/************************生成png**************************/
 	dotFile << "digraph srcPic{";
@@ -106,6 +104,7 @@ int main()
 	char cmdExe[] = "D:\\Graphviz2.38\\bin\\dot.exe -Tpng -o graph.png graph.dot";
 	WinExec(cmdExplore, SW_NORMAL);
 	WinExec(cmdExe, SW_NORMAL);
+	cout << "complete the picture!\n";
 
 	//clear------------------------------------
 	for (int i = 0; i < nodeVec.size(); i++)
