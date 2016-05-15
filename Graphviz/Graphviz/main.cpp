@@ -8,15 +8,14 @@ using namespace std;
 int main()
 {
 	//后面记得清空一下指针
-	ofstream dotFile;
-	vector<Node*>  nodeVec;
-	hash_map<string, Node*> nodeTable;	
-	hash_map<string, Node*>::iterator it;
+	ofstream dotFile;			//.dot文件
+	vector<Node*>  nodeVec;			//存放图中出现的所有节点
+	vector<string> tmpIDs;			//存放所有节点的ID
+	hash_map<string, Node*> nodeTable;			//将节点的ID与相应的Node组成一张表，便于通过ID查找node
+	hash_map<string, Node*>::iterator it;		//用于遍历hash表的迭代器
 	dotFile.open("graph.dot");
 
 	string strID;
-	vector<string> tmpIDs;
-
 	bool needReinput = true;
 	while (needReinput)
 	{
@@ -36,6 +35,7 @@ int main()
 
 	}
 	cin.clear();
+	cin.sync();
 
 	for (int i = 0; i<tmpIDs.size(); i++)
 	{
@@ -69,25 +69,28 @@ int main()
 				}
 				tmpTransitions.push_back(strTransition);
 			}
-			for (int i = 0; i < tmpTransitions.size(); i++)
-				transitionToNode.push_back(nodeTable[tmpTransitions[i]]);
-
+			if (needReinput == false)
+			{
+				for (int i = 0; i < tmpTransitions.size(); i++)
+					transitionToNode.push_back(nodeTable[tmpTransitions[i]]);
+			}
+			
 		}
 		nodeVec[i]->setTransitions(transitionToNode);
 		cin.clear();
 		cin.sync();
 	}
 
+	/************************生成png**************************/
 	dotFile << "digraph srcPic{";
-	vector<Node*> tmpTransions;
 	for (int i = 0; i < nodeVec.size(); i++)
 	{
-		tmpTransions = nodeVec[i]->getTransitions();
-		if (tmpTransions.size()>0)
+		transitionToNode = nodeVec[i]->getTransitions();
+		if (transitionToNode.size()>0)
 		{
-			for (int j = 0; j < tmpTransions.size(); j++)
+			for (int j = 0; j < transitionToNode.size(); j++)
 			{
-				dotFile << nodeVec[i]->getID() << "->" << tmpTransions[j]->getID() << " ";
+				dotFile << nodeVec[i]->getID() << "->" << transitionToNode[j]->getID() << " ";
 			}
 		}
 		else
@@ -112,8 +115,8 @@ int main()
 	}
 	nodeVec.clear();
 
-	for (int i = 0; i < tmpTransions.size(); i++)
-		tmpTransions[i] = NULL;
+	for (int i = 0; i < transitionToNode.size(); i++)
+		transitionToNode[i] = NULL;
 	nodeVec.clear();
 
 	for (it = nodeTable.begin(); it != nodeTable.end(); ++it)
