@@ -1,126 +1,107 @@
-#include "Node.h"
-#include <windows.h>
-#include <iostream>
-#include <fstream>
-#include <hash_map>
+ï»¿#include "fstream" 
+#include "strstream" 
+#include "Util.h"
 using namespace std;
+
+
+#define  nodeCount 5              //é¢˜ç›®ä¸­å¯èƒ½çš„æœ€å¤§ç‚¹æ•°       
+int STACK[nodeCount], top = 0;          //Tarjan ç®—æ³•ä¸­çš„æ ˆ 
+bool InStack[nodeCount];             //æ£€æŸ¥æ˜¯å¦åœ¨æ ˆä¸­ 
+int DFN[nodeCount];                  //æ·±åº¦ä¼˜å…ˆæœç´¢è®¿é—®æ¬¡åº 
+int Low[nodeCount];                  //èƒ½è¿½æº¯åˆ°çš„æœ€æ—©çš„æ¬¡åº 
+int ComponetNumber = 0;        //æœ‰å‘å›¾å¼ºè¿é€šåˆ†é‡ä¸ªæ•° 
+int Index = 0;                 //ç´¢å¼•å· 
+vector <int> Edge[nodeCount];        //é‚»æ¥è¡¨è¡¨ç¤º 
+vector <int> Component[nodeCount];   //è·å¾—å¼ºè¿é€šåˆ†é‡ç»“æœ
+
+void Tarjan(int i)
+{
+	int j;
+	DFN[i] = Low[i] = Index++;
+	InStack[i] = true;
+	STACK[++top] = i;
+	for (int e = 0; e<Edge[i].size(); e++)
+	{
+		j = Edge[i][e];
+		if (DFN[j] == -1)
+		{
+			Tarjan(j);
+			Low[i] = min(Low[i], Low[j]);
+		}
+		else if (InStack[j])
+			Low[i] = min(Low[i], DFN[j]);
+	}
+	if (DFN[i] == Low[i])
+	{
+		/*cout << "TT    " << i << "   " << Low[i] << endl;*/
+		ComponetNumber++;
+		do
+		{
+			j = STACK[top--];
+			InStack[j] = false;
+			Component[ComponetNumber].push_back(j);
+		} while (j != i);
+	}
+}
+
+void solve(int N)     //æ­¤å›¾ä¸­ç‚¹çš„ä¸ªæ•°ï¼Œæ³¨æ„æ˜¯0-indexedï¼ 
+{
+	memset(STACK, -1, sizeof(STACK));
+	memset(InStack, 0, sizeof(InStack));
+	memset(DFN, -1, sizeof(DFN));
+	memset(Low, -1, sizeof(Low));
+	for (int i = 0; i<N; i++)
+	if (DFN[i] == -1)
+		Tarjan(i);
+}
+
 
 int main()
 {
-	//ºóÃæ¼ÇµÃÇå¿ÕÒ»ÏÂÖ¸Õë
-	ifstream inFile("inputPic.txt");
-	ofstream dotFile;			//.dotÎÄ¼ş
-	vector<Node*>  nodeVec;			//´æ·ÅÍ¼ÖĞ³öÏÖµÄËùÓĞ½Úµã
-	vector<string> tmpIDs;			//´æ·ÅËùÓĞ½ÚµãµÄID
-	hash_map<string, Node*> nodeTable;			//½«½ÚµãµÄIDÓëÏàÓ¦µÄNode×é³ÉÒ»ÕÅ±í£¬±ãÓÚÍ¨¹ıID²éÕÒnode
-	hash_map<string, Node*>::iterator it;		//ÓÃÓÚ±éÀúhash±íµÄµü´úÆ÷
-	dotFile.open("graph.dot");
-	int errNum=0;
-
+	ifstream inFile("orgPic.txt");
 	string str;
-	int inputType=-1;			//Óöµ½"//"±íÊ¾ÇĞ»»ÊäÈëÀàĞÍ£¬-1±íÊ¾Ä¿Ç°ÊäÈëµÄÊÇ½Úµã£¬0±íÊ¾µÚ0¸ö½ÚµãµÄtransitionÁĞ±í£¬1±íÊ¾µÚ1¸ö½ÚµãµÄ...
-	vector<Node*> transitionToNode;
-	vector<string> tmpTransitions;
-	while (inFile >> str)
+	vector<int> transitions;
+
+	int nodeIndex = -1;		//é‡åˆ°"//"è¡¨ç¤ºåˆ‡æ¢è¾“å…¥ç±»å‹ï¼Œ-2è¡¨ç¤ºè¾“å…¥èŠ‚ç‚¹æ•°ï¼Œ-1è¡¨ç¤ºç›®å‰è¾“å…¥çš„æ˜¯èŠ‚ç‚¹ï¼Œ0è¡¨ç¤ºç¬¬0ä¸ªèŠ‚ç‚¹çš„transitionåˆ—è¡¨ï¼Œ1è¡¨ç¤ºç¬¬1ä¸ªèŠ‚ç‚¹çš„...
+	while (inFile >> str)		//ç”±äºè¿™é‡Œè¾“å…¥0åˆ°nodeCountçš„æ•°å­—ï¼Œæ‰€ä»¥å–æ¶ˆå¯¹nodeIDçš„æ£€æŸ¥
 	{
-		/*cout << "Read from file: " << str << endl;*/
-		if (str == "//")
-		{
-			if (inputType == -1)			//½ÚµãÁĞ±íÊäÈëÍê±Ï
-			{
-				for (int i = 0; i<tmpIDs.size(); i++)
-				{
-					Node* node = new Node();
-					node->setID(tmpIDs[i]);
-					nodeVec.push_back(node);
-					nodeTable[tmpIDs[i]] = node;
-				}
-			}
-			if (inputType>-1 && inputType < nodeVec.size())
-			{
-				for (int i = 0; i < tmpTransitions.size(); i++)
-					transitionToNode.push_back(nodeTable[tmpTransitions[i]]);
-				nodeVec[inputType]->setTransitions(transitionToNode);
-				transitionToNode.clear();
-				tmpTransitions.clear();
-			}
-			inputType++;
+		if (str != "//")
 			continue;
-		}
-		if (inputType == -1)
-		{
-			if (count(tmpIDs.begin(), tmpIDs.end(), str)>0)
-			{
-				cout << "There are some repeated Node IDs!\n";
-				errNum = 1;
-				return errNum;
-			}
-			else
-			{
-				tmpIDs.push_back(str);
-			}
-		}
-		
-		if (inputType > -1 && inputType < nodeVec.size())
-		{
-			cout << "The transitions of the Node (" << inputType << "): "<<str<<"\n";
-			if (find(tmpIDs.begin(), tmpIDs.end(), str) == tmpIDs.end() || find(tmpTransitions.begin(), tmpTransitions.end(), str) != tmpTransitions.end())
-			{
-				cout << "There are some invalid transitions or repeated transitions!\n";
-				errNum = 2;
-				return errNum;
-			}
-			else
-			{
-				tmpTransitions.push_back(str);
-			}
-		}
-
-	}
-	cout << "complete reading!\n";
-
-	/************************Éú³Épng**************************/
-	dotFile << "digraph srcPic{";
-	for (int i = 0; i < nodeVec.size(); i++)
-	{
-		transitionToNode = nodeVec[i]->getTransitions();
-		if (transitionToNode.size()>0)
-		{
-			for (int j = 0; j < transitionToNode.size(); j++)
-			{
-				dotFile << nodeVec[i]->getID() << "->" << transitionToNode[j]->getID() << " ";
-			}
-		}
 		else
 		{
-			dotFile << nodeVec[i]->getID() << " ";
+			nodeIndex++;
+			break;
 		}
 	}
-	dotFile << "}";
-	dotFile.flush();
-	dotFile.close();
-
-	char cmdExplore[] = "D:";
-	char cmdExe[] = "D:\\Graphviz2.38\\bin\\dot.exe -Tpng -o graph.png graph.dot";
-	WinExec(cmdExplore, SW_NORMAL);
-	WinExec(cmdExe, SW_NORMAL);
-	cout << "complete the picture!\n";
-
-	//clear------------------------------------
-	for (int i = 0; i < nodeVec.size(); i++)
+	while (inFile >> str)
 	{
-		delete nodeVec[i];
-		nodeVec[i] = NULL;
+		if (str == "//"){
+			nodeIndex++;
+			continue;
+		}
+		int n = atoi(str.c_str());
+		if (nodeIndex > -1 && nodeIndex < nodeCount)
+		{
+			Edge[nodeIndex].push_back(n);
+		}
 	}
-	nodeVec.clear();
+	cout << "complete reading the original picture!\n";
 
-	for (int i = 0; i < transitionToNode.size(); i++)
-		transitionToNode[i] = NULL;
-	nodeVec.clear();
+	/*************************ç”ŸæˆåŸå›¾**********************************/
+	cout << endl;
+	cout << "ç”ŸæˆåŸå›¾..." << endl;
+	Util::generatePNG("orgPic.txt", "orgDot.dot", "D:\\Graphviz2.38\\bin\\dot.exe", "orgPNG.png", Component, nodeCount, 0);
 
-	for (it = nodeTable.begin(); it != nodeTable.end(); ++it)
-		(*it).second = NULL;
-	nodeTable.clear();
+	/******************************è¾“å‡ºå¼ºè¿é€šåˆ†é‡***************************************/
+	cout << endl;
+	cout << "è®¡ç®—å¼ºè¿é€šåˆ†é‡..." << endl;
+	solve(nodeCount);
+	cout << "ComponetNumber is " << ComponetNumber << endl;
+
+	/*****************************è¾“å‡ºå¼ºè¿é€šå›¾ç‰‡*****************************************/
+	cout << endl;
+	cout << "è¾“å‡ºå¼ºè¿é€šåˆ†é‡å›¾..." << endl;
+	Util::generatePNG("orgPic.txt", "SCCDot.dot", "D:\\Graphviz2.38\\bin\\dot.exe", "SCCPNG.png", Component, nodeCount, ComponetNumber);
 
 	return 0;
 }
