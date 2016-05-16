@@ -3,8 +3,15 @@
 #include "Util.h"
 using namespace std;
 
+#define orgInputName "orgPic.txt"
+#define orgDotName "orgDot.dot"
+#define SCCDotName "SCCDot.dot"
+#define dotExeDir "D:\\Graphviz2.38\\bin\\dot.exe"
+#define orgPNGName "orgPNG.png"
+#define SCCPNGName "SCCPNG.png"
 
-#define  nodeCount 5              //题目中可能的最大点数       
+
+#define  nodeCount 4              //题目中可能的最大点数       
 int STACK[nodeCount], top = 0;          //Tarjan 算法中的栈 
 bool InStack[nodeCount];             //检查是否在栈中 
 int DFN[nodeCount];                  //深度优先搜索访问次序 
@@ -58,9 +65,8 @@ void solve(int N)     //此图中点的个数，注意是0-indexed！
 
 int main()
 {
-	ifstream inFile("orgPic.txt");
+	ifstream inFile(orgInputName);
 	string str;
-	vector<int> transitions;
 
 	int nodeIndex = -1;		//遇到"//"表示切换输入类型，-2表示输入节点数，-1表示目前输入的是节点，0表示第0个节点的transition列表，1表示第1个节点的...
 	while (inFile >> str)		//由于这里输入0到nodeCount的数字，所以取消对nodeID的检查
@@ -90,7 +96,7 @@ int main()
 	/*************************生成原图**********************************/
 	cout << endl;
 	cout << "生成原图..." << endl;
-	Util::generatePNG("orgPic.txt", "orgDot.dot", "D:\\Graphviz2.38\\bin\\dot.exe", "orgPNG.png", Component, nodeCount, 0);
+	Util::generatePNG(orgInputName, orgDotName, dotExeDir, orgPNGName, Component, nodeCount, 0);
 
 	/******************************输出强连通分量***************************************/
 	cout << endl;
@@ -101,7 +107,7 @@ int main()
 	/*****************************输出强连通图片*****************************************/
 	cout << endl;
 	cout << "输出强连通分量图..." << endl;
-	Util::generatePNG("orgPic.txt", "SCCDot.dot", "D:\\Graphviz2.38\\bin\\dot.exe", "SCCPNG.png", Component, nodeCount, ComponetNumber);
+	Util::generatePNG(orgInputName, SCCDotName, dotExeDir, SCCPNGName, Component, nodeCount, ComponetNumber);
 
 	return 0;
 }
