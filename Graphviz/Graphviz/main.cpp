@@ -1,12 +1,13 @@
 ﻿#include "fstream" 
 #include "strstream" 
+#include <stdio.h>
 #include "Util.h"
 using namespace std;
 
 #define orgInputName "orgPic.txt"
 #define orgDotName "orgDot.dot"
 #define SCCDotName "SCCDot.dot"
-#define dotExeDir "D:\\Graphviz2.38\\bin\\dot.exe"
+#define dotExeDir "F:\\Graphviz2.38\\bin\\dot.exe"
 #define orgPNGName "orgPNG.png"
 #define SCCPNGName "SCCPNG.png"
 
@@ -109,5 +110,12 @@ int main()
 	cout << "输出强连通分量图..." << endl;
 	Util::generatePNG(orgInputName, SCCDotName, dotExeDir, SCCPNGName, Component, nodeCount, ComponetNumber);
 
+	string pngOrg = orgPNGName;
+	const char* png1 = pngOrg.c_str();
+	string pngSCC = SCCPNGName;
+	const char* png2 = pngSCC.c_str();
+
+	system(png1);
+	system(png2);
 	return 0;
 }
