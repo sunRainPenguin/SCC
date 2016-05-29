@@ -1,0 +1,18 @@
+﻿生成启动时间为 2016/5/29 19:12:29。
+     1>项目“E:\gitRep\SCC\Graphviz\Graphviz\Graphviz.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         D:\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         main.cpp
+     1>e:\gitrep\scc\graphviz\graphviz\main.cpp(31): warning C4018: “<”: 有符号/无符号不匹配
+     1>e:\gitrep\scc\graphviz\graphviz\main.cpp(114): warning C4018: “>=”: 有符号/无符号不匹配
+     1>e:\gitrep\scc\graphviz\graphviz\main.cpp(128): warning C4018: “<”: 有符号/无符号不匹配
+       Link:
+         D:\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\gitRep\SCC\Graphviz\Debug\Graphviz.exe" /INCREMENTAL /NOLOGO opencv_ts300d.lib opencv_world300d.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"E:\gitRep\SCC\Graphviz\Debug\Graphviz.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\gitRep\SCC\Graphviz\Debug\Graphviz.lib" /MACHINE:X86 Debug\main.obj
+         Debug\Node.obj
+         Debug\Util.obj
+         Graphviz.vcxproj -> E:\gitRep\SCC\Graphviz\Debug\Graphviz.exe
+     1>已完成生成项目“E:\gitRep\SCC\Graphviz\Graphviz\Graphviz.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:03.95

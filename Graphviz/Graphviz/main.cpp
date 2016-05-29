@@ -7,12 +7,12 @@ using namespace std;
 #define orgInputName "orgPic.txt"
 #define orgDotName "orgDot.dot"
 #define SCCDotName "SCCDot.dot"
-#define dotExeDir "F:\\Graphviz2.38\\bin\\dot.exe"
+#define dotExeDir "D:\\Graphviz2.38\\bin\\dot.exe"
 #define orgPNGName "orgPNG.png"
 #define SCCPNGName "SCCPNG.png"
 
 
-#define  nodeCount 4              //题目中可能的最大点数       
+#define  nodeCount 5              //题目中可能的最大点数       
 int STACK[nodeCount], top = 0;          //Tarjan 算法中的栈 
 bool InStack[nodeCount];             //检查是否在栈中 
 int DFN[nodeCount];                  //深度优先搜索访问次序 
@@ -104,6 +104,31 @@ int main()
 	cout << "计算强连通分量..." << endl;
 	solve(nodeCount);
 	cout << "ComponetNumber is " << ComponetNumber << endl;
+
+	int maxSize = 0;
+	vector<int> maxComponent;
+	for (int i = 0; i<nodeCount; i++)
+	{
+		if (Component[i].size() > 0 )
+		{
+			if (Component[i].size() >= maxSize)
+				maxSize = Component[i].size();
+		}
+	}
+	for (int i = 0; i < nodeCount; i++)
+	{
+		if (Component[i].size() == maxSize)
+			maxComponent.push_back(i);
+	}
+	cout << "Largest component:" << endl;
+	while (maxComponent.empty() == false)
+	{
+		int i = maxComponent.back();
+		maxComponent.pop_back();
+		for (int j = 0; j < Component[i].size(); j++)
+			cout << Component[i][j] << " ";
+		cout << endl;
+	}
 
 	/*****************************输出强连通图片*****************************************/
 	cout << endl;
