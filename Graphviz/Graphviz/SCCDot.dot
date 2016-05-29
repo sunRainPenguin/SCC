@@ -1,15 +1,12 @@
 digraph srcPic{
 0->1 
 1->2 
-2->0 
-2->4 
-3->0 
-3->2 
+2->3 
 3->4 
-4 
+4->0 
 4[ fillcolor="#e1ffff",style=filled]
-2[ fillcolor="#ffe1ff",style=filled]
-1[ fillcolor="#ffe1ff",style=filled]
-0[ fillcolor="#ffe1ff",style=filled]
-3[ fillcolor="#ffffe1",style=filled]
+3[ fillcolor="#e1ffff",style=filled]
+2[ fillcolor="#e1ffff",style=filled]
+1[ fillcolor="#e1ffff",style=filled]
+0[ fillcolor="#e1ffff",style=filled]
 }

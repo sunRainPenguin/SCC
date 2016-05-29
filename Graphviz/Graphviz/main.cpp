@@ -12,17 +12,9 @@ using namespace std;
 #define SCCPNGName "SCCPNG.png"
 
 
-#define  nodeCount 5              //题目中可能的最大点数       
-int STACK[nodeCount], top = 0;          //Tarjan 算法中的栈 
-bool InStack[nodeCount];             //检查是否在栈中 
-int DFN[nodeCount];                  //深度优先搜索访问次序 
-int Low[nodeCount];                  //能追溯到的最早的次序 
-int ComponetNumber = 0;        //有向图强连通分量个数 
-int Index = 0;                 //索引号 
-vector <int> Edge[nodeCount];        //邻接表表示 
-vector <int> Component[nodeCount];   //获得强连通分量结果
 
-void Tarjan(int i)
+
+void Tarjan(int i, int DFN[], int Low[], int& Index, bool InStack[], int STACK[], int& top, vector<int> Edge[], int& ComponetNumber, vector<int> Component[])
 {
 	int j;
 	DFN[i] = Low[i] = Index++;
@@ -33,7 +25,7 @@ void Tarjan(int i)
 		j = Edge[i][e];
 		if (DFN[j] == -1)
 		{
-			Tarjan(j);
+			Tarjan(j, DFN, Low, Index, InStack, STACK, top, Edge, ComponetNumber, Component);
 			Low[i] = min(Low[i], Low[j]);
 		}
 		else if (InStack[j])
@@ -47,20 +39,9 @@ void Tarjan(int i)
 		{
 			j = STACK[top--];
 			InStack[j] = false;
-			Component[ComponetNumber].push_back(j);
+			Component[ComponetNumber-1].push_back(j);
 		} while (j != i);
 	}
-}
-
-void solve(int N)     //此图中点的个数，注意是0-indexed！ 
-{
-	memset(STACK, -1, sizeof(STACK));
-	memset(InStack, 0, sizeof(InStack));
-	memset(DFN, -1, sizeof(DFN));
-	memset(Low, -1, sizeof(Low));
-	for (int i = 0; i<N; i++)
-	if (DFN[i] == -1)
-		Tarjan(i);
 }
 
 
@@ -68,18 +49,29 @@ int main()
 {
 	ifstream inFile(orgInputName);
 	string str;
+	int nodeCount = 0;              //题目中可能的最大点数
 
-	int nodeIndex = -1;		//遇到"//"表示切换输入类型，-2表示输入节点数，-1表示目前输入的是节点，0表示第0个节点的transition列表，1表示第1个节点的...
+	//************************计算有多少节点************************************
+	//遇到"//"表示切换输入类型，-2表示输入节点数，-1表示目前输入的是节点，0表示第0个节点的transition列表，1表示第1个节点的...
 	while (inFile >> str)		//由于这里输入0到nodeCount的数字，所以取消对nodeID的检查
 	{
-		if (str != "//")
-			continue;
-		else
-		{
-			nodeIndex++;
+		if (str == "//")
 			break;
-		}
+		else
+			nodeCount++;
 	}
+	//根据节点数量声明的一些变量
+	int* STACK = new int[nodeCount];		//Tarjan 算法中的栈 
+	int top = -1;
+	bool* InStack = new bool[nodeCount];		 //检查是否在栈中 
+	int* DFN = new int[nodeCount];		//深度优先搜索访问次序 
+	int* Low = new int[nodeCount];		 //能追溯到的最早的次序 
+	int ComponetNumber = 0;       //有向图强连通分量个数 
+	int Index = 0;					 //索引号 
+	vector<int>* Edge = new vector <int>[nodeCount];		//邻接表表示 
+	vector<int>* Component = new vector<int>[nodeCount];		//获得强连通分量结果
+	
+	int nodeIndex = 0;
 	while (inFile >> str)
 	{
 		if (str == "//"){
@@ -102,7 +94,16 @@ int main()
 	/******************************输出强连通分量***************************************/
 	cout << endl;
 	cout << "计算强连通分量..." << endl;
-	solve(nodeCount);
+	for (int i = 0; i < nodeCount; i++)
+	{
+		STACK[i] = -1;
+		InStack[i] = false;
+		DFN[i] = -1;
+		Low[i] = -1;
+	}
+	for (int i = 0; i<nodeCount; i++)
+	 if (DFN[i] == -1)
+		Tarjan(i,DFN, Low,Index, InStack,STACK,top,Edge,ComponetNumber,Component);
 	cout << "ComponetNumber is " << ComponetNumber << endl;
 
 	int maxSize = 0;
